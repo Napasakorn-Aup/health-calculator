@@ -10,7 +10,10 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, where, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot, collection, query, where, addDoc, getDocs, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Enable Firebase debug logging
+        setLogLevel('debug');
 
         // Global variables provided by the environment
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -44,6 +47,9 @@
 
         // UI Initialization and Listeners
         document.addEventListener('DOMContentLoaded', () => {
+            // Show the initial tab on page load
+            showSection('bmi-tab');
+
             // Initial auth state check
             onAuthStateChanged(auth, async (user) => {
                 const userIdDisplay = document.getElementById('user-id');
@@ -53,7 +59,7 @@
                     // Authentication successful
                     userId = user.uid;
                     userIdDisplay.textContent = userId;
-                    statusMessage.textContent = 'Login successful!';
+                    statusMessage.textContent = 'Login successful! Data is ready.';
                     statusMessage.classList.remove('text-red-500');
                     statusMessage.classList.add('text-green-500');
                     console.log("User signed in with ID:", userId);
@@ -82,7 +88,7 @@
                 } else {
                     // Authentication pending or failed
                     console.log("No user signed in. Attempting to sign in...");
-                    statusMessage.textContent = 'Authenticating...';
+                    statusMessage.textContent = 'Authenticating... Please wait.';
                     userIdDisplay.textContent = 'Loading...';
                     statusMessage.classList.remove('text-red-500', 'text-green-500');
                     try {
@@ -93,7 +99,7 @@
                         }
                     } catch (error) {
                         console.error("Authentication failed:", error);
-                        statusMessage.textContent = 'Login failed: Please check your connection.';
+                        statusMessage.textContent = 'Login failed. Check your network connection.';
                         userIdDisplay.textContent = 'ID Not Found';
                         statusMessage.classList.remove('text-green-500');
                         statusMessage.classList.add('text-red-500');
